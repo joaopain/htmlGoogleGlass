@@ -4,6 +4,7 @@
 	<title>Tudo sobre Google Glass</title>
 	<link rel="stylesheet" type="text/css" href="_css/estilo.css"/>
     <link rel="stylesheet" type="text/css" href="_css/form.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.1.js"></script>
 </head>
 <script language="javascript" src="_javascript/funcoes.js "></script>
 <script>
@@ -65,24 +66,11 @@
                 <p><label for="cNum">Número:</label>
                     <input type="number" name="tNum" id="cNum" min="0" max="99999"/></p>
                 <p><label for="cEst">Estado:</label>
-                <select name="tEst" id="cEst">
-                    <option>Rio de Janeiro</option>
-                    <option>São Paulo</option>
-                    <option>Minas Gerais</option>
-                    <option selected>Paraná</option>
-                    <option>Santa Catarina</option>
-                    <option>Rio Grande do Sul</option>
-                    <option>Bahia</option>
-                    <option>Mato Grosso</option>
-                </select> </p>
-                <p><label for="cCid">Cidade:</label>
-                <input type="text" name="tCid" id="cCid" maxlength="40" size="20" placeholder="Sua Cidade" list="cidades" /></p>
-                <datalist id="cidades">
-                    <option value="Rio de janeiro"></option>
-                    <option value="niterói"></option>
-                    <option value="Nova Iguaçu"></option>
-                    <option value="belford roxo"></option>
-                </datalist>
+                    <p><label for="cEst">Estado:</label>                
+                        <select name="estado"></select>          
+                    </p>
+                    <p><label for="cCid">Cidade:</label>                
+                    <select name="cidade"></select>                                    
             </fieldset>
 
             <fieldset id="mensagem"><legend>Mensagem do Usuário</legend>
@@ -114,4 +102,37 @@
 </footer>
 </div>
 </body>
+
+
+
+
+<script>
+
+$.getJSON('https://servicodados.ibge.gov.br/api/v1/localidades/estados/', function (json) {
+
+var options = '<option value=""> Selecio um estado </option>';
+for (var i = 0; i < json.length; i++) {
+options += '<option data-id="' + json[i].id + '" value="' + json[i].nome + '" >' + json[i].nome + '</option>';
+}
+$("select[name='estado']").html(options);
+});
+
+
+$("select[name='estado']").change(function () {
+if ($(this).val()) {
+$.getJSON('https://servicodados.ibge.gov.br/api/v1/localidades/estados/'+$(this).find("option:selected").attr('data-id')+'/municipios', {id: $(this).find("option:selected").attr('data-id')}, function (json) {
+var options = '<option value="">Selecione uma cidade</option>';
+for (var i = 0; i < json.length; i++) {
+options += '<option value="' + json[i].nome + '" >' + json[i].nome + '</option>';
+}
+$("select[name='cidade']").html(options);
+});
+} else {
+$("select[name='cidade']").html('<option value="">–  –</option>');
+}
+
+});
+</script>
+
+</html>
 </html>
